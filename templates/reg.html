@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Регистрация</title>
+</head>
+<body>
+<div class="grid">
+    <h1>Kingdom tower</h1>
+    <p>Авторизация</p>
+    {% if error %}
+    <div style="color: red;">{{ error }}</div>
+    {% endif %}
+    <form action="file_maneger/reg" method="post">
+        <input type="text" name="Login" value="{{ login or '' }}" placeholder="Имя пользователя" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <input type="password" name="password_correct" placeholder="Подтвердите пароль" required>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+    <a href="/"><i class="register">Вернутся</i></a>
+</div>
+</body>
+</html>
