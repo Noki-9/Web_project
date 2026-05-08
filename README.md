@@ -42,12 +42,10 @@ fastapi, uvicorn, sqlalchemy, pydantic, python-multipart (для форм), jinj
 Установите зависимости
 Желательно использовать виртуальное окружение:
 
-bash
 pip install fastapi uvicorn sqlalchemy pydantic python-multipart jinja2
 Запустите приложение
 Из корневой папки проекта выполните:
 
-bash
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 --reload автоматически перезагружает сервер при изменениях кода (удобно для разработки).
 
@@ -56,23 +54,6 @@ uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 Откройте браузер и перейдите по адресу:
 http://127.0.0.1:8000
 
-Структура проекта\n
-text\n
-project/\n
-├── main.py                 # Основное приложение FastAPI, маршруты\n
-├── Forms.py                # Pydantic-схемы и SQLAlchemy-модели (UserAccount, Kingdom, Request_db)\n
-├── database.py             # Подключение к SQLite, сессии, базовый класс\n
-├── static/\n
-│   └── css/\n
-│       └── kingdom_style.css   # Стили для страницы королевства\n
-├── scripts/\n
-│   └── kingdom_script.js       # Клиентская логика управления королевством\n
-├── templates/\n
-│   ├── index.html          # Страница входа\n
-│   ├── reg.html            # Страница регистрации\n
-│   ├── file_maneger.html   # Список королевств пользователя\n
-│   └── kingdom.html        # Главная панель управления королевством\n
-└── database.db             # Создаётся автоматически при первом запуске\n
 API эндпоинты
 Метод	Endpoint	Описание
 GET	/	Страница входа
