@@ -1,0 +1,51 @@
+body {
+    background: linear-gradient(145deg, darkgreen, #00bac0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.grid {
+    background-color: white;
+    border-radius: 20px;
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+input, button {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: darkgreen;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.register {
+    display: inline-block;
+    margin-top: 20px;
+    color: darkgreen;
+    text-decoration: none;
+}
+
+.register:hover {
+    text-decoration: underline;
+}
