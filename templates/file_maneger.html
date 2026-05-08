@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/file_manager_style.css">
+    <title>Файловый менеджер</title>
+</head>
+<body>
+<div class="container">
+    <div class="toolbar">
+        <button class="btn-upload" onclick="uploadSelected()">
+            <span class="icon">💾</span> Загрузить
+        </button>
+        <button class="btn-create" onclick="createKingdom()">Создать</button>
+    </div>
+    <div class="workspace">
+        {% if kingdoms %}
+        <ul id="kingdom-list">
+            {% for k in kingdoms %}
+            <!-- Убрана кнопка "Загрузить" внутри элемента; теперь элемент можно выбрать кликом -->
+            <li data-id="{{ k.id }}" onclick="selectKingdom(this)">{{ k.name }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Нет королевств</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+    // Переменная для хранения ID выбранного королевства
+    let selectedId = null;
+
+    // Функция выбора элемента списка
+    function selectKingdom(element) {
+        // Снимаем выделение со всех элементов
+        document.querySelectorAll('#kingdom-list li').forEach(li => {
+            li.classList.remove('selected');
+        });
+        // Выделяем текущий элемент
+        element.classList.add('selected');
+        selectedId = element.getAttribute('data-id');
+    }
+
+    // Функция загрузки выбранного королевства (аналог бывших индивидуальных кнопок)
+    function uploadSelected() {
+        if (selectedId) {
+            window.location.href = `/kingdom?kingdom_id=${selectedId}`;
+        } else {
+            alert('Пожалуйста, выберите королевство из списка.');
+        }
+    }
+
+    // Функция создания нового королевства (остаётся без изменений)
+    function createKingdom() {
+        window.location.href = '/kingdom';
+    }
+</script>
+</body>
+</html>
