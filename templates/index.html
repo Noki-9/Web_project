@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Kingdom.com</title>
+</head>
+<body>
+<div class="grid">
+    <h1>Kingdom tower</h1>
+    <p>Авторизация</p>
+    {% if error %}
+    <div style="color: red;">{{ error }}</div>
+    {% endif %}
+    <form action="login" method="post">
+        <input type="text" name="Login" id="Login_input" placeholder="Логин">
+        <input type="password" name="password" id="pass" placeholder="Пароль">
+        <button>Войти</button>
+    </form>
+    <a href="reg"><i class="register">Регистрация</i></a>
+</div>
+</body>
+</html>
