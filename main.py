@@ -278,3 +278,18 @@ async def save_kingdom(request: Request, db: Session = Depends(get_db)):
 
     db.commit()
     return {"status": "ok", "id": kingdom_id}
+
+
+@app.delete("/kingdom/{kingdom_id}")
+async def delete_kingdom(kingdom_id: int, request: Request, db: Session = Depends(get_db)):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+
+    kingdom = db.query(Kingdom).filter(Kingdom.id == kingdom_id, Kingdom.user_id == user_id).first()
+    if not kingdom:
+        raise HTTPException(status_code=404, detail="Королевство не найдено")
+
+    db.delete(kingdom)
+    db.commit()
+    return {"status": "ok"}
