@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/kingdom_style.css">
+    <title>Kingdom Tower</title>
+</head>
+<body>
+<div class="main-panel">
+    <!-- Шапка с названием и гербом -->
+    <div class="header">
+        <input type="text" id="kingdom-name" class="kingdom-name" placeholder="Название королевства"
+               value="Моё королевство">
+        <div class="image-area" id="image-area" title="Нажмите, чтобы загрузить герб">
+            <!-- сюда будет вставлено изображение -->
+        </div>
+        <button class="load-image-btn" id="load-image-btn">Загрузить герб</button>
+    </div>
+
+    <!-- Ресурсы -->
+    <div class="section-title">Ресурсы</div>
+    <div class="grid">
+        <label>Пшеница <input type="text" id="wheat" value="30"></label>
+        <label>Золото <input type="text" id="gold" value="1"></label>
+        <label>Железо <input type="text" id="iron" value="0"></label>
+        <label>Фабрика <input type="text" id="factor" value="20"></label>
+        <label>Инструменты <input type="text" id="tools" value="0"></label>
+        <label>Оружие <input type="text" id="weapons" value="0"></label>
+    </div>
+
+    <!-- Население -->
+    <div class="section-title">Население</div>
+    <div class="grid">
+        <label>Люди <input type="text" id="people" value="17"></label>
+        <label>Счастье <input type="text" id="happy" value="100"></label>
+        <label>Институт <input type="text" id="institut" value="1"></label>
+        <label>Уровень <input type="text" id="level" value="1" readonly></label>
+    </div>
+
+    <!-- Экономика -->
+    <div class="section-title">Экономика</div>
+    <div class="economy-block">
+        <div class="economy-row">
+            <div class="economy-item">
+                <label>Прибыль</label>
+                <input type="text" id="economy_profit" value="10" readonly>
+            </div>
+            <div class="economy-item">
+                <label>Казна</label>
+                <input type="text" id="economy_kazna" value="0">
+            </div>
+            <div class="economy-item">
+                <label>Плюс</label>
+                <input type="text" id="economy_plus" value="0">
+            </div>
+            <div class="economy-item">
+                <label>Минус</label>
+                <input type="text" id="economy_minus" value="0">
+            </div>
+            <button class="update-btn" id="update-economy">Обновить ход</button>
+        </div>
+    </div>
+
+    <!-- Юниты (все 10) -->
+    <div class="section-title">Юниты</div>
+    <div class="grid">
+        <label>Воины <input type="text" id="war_unit" value="0"></label>
+        <label>Лучники <input type="text" id="arrow_unit" value="0"></label>
+        <label>Маги <input type="text" id="mag_unit" value="0"></label>
+        <label>Башня <input type="text" id="town_unit" value="0"></label>
+        <label>Военные корабли <input type="text" id="war_ship_unit" value="0"></label>
+        <label>Военный транспорт <input type="text" id="war_ride_unit" value="0"></label>
+        <label>Пушка <input type="text" id="weapon_unit" value="0"></label>
+        <label>Всадники <input type="text" id="ride_unit" value="0"></label>
+        <label>Корабли <input type="text" id="ship_unit" value="0"></label>
+        <label>Логистика <input type="text" id="logic_unit" value="0"></label>
+        <label>Склад <input type="text" id="cheast_unit" value="0"></label>
+    </div>
+
+    <!-- Торговля и запросы -->
+    <div class="section-title">Торговля</div>
+    <div class="trade-row">
+        <div class="trade-item">
+            <label>Объект</label>
+            <input type="text" id="trade_out" readonly>
+        </div>
+        <div class="trade-item">
+            <label>Королевство</label>
+            <input type="text" id="trade_out_kingdom" readonly>
+        </div>
+    </div>
+
+    <div class="section-title">Запросы</div>
+    <div class="request-area">
+        <div class="request-input-group">
+            <input type="text" id="request_input" placeholder="имя объект количество">
+            <button id="add-request">Добавить</button>
+        </div>
+        <ul class="request-list" id="request_output"></ul>
+    </div>
+
+    <!-- Кнопка выхода (для вида) -->
+    <button class="exit-btn" onclick="location.reload()">Начать заново</button>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button class="save-button" id="saveBtn">Сохранить</button>
+    </div>
+</div>
+
+<script>
+    const kingdomData = {{ kingdom|tojson if kingdom else 'null' }};
+</script>
+<script src="/scripts/kingdom_script.js"></script>
+</body>
+</html>
