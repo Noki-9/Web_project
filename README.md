@@ -56,23 +56,23 @@ uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 Откройте браузер и перейдите по адресу:
 http://127.0.0.1:8000
 
-Структура проекта
-text
-project/
-├── main.py                 # Основное приложение FastAPI, маршруты
-├── Forms.py                # Pydantic-схемы и SQLAlchemy-модели (UserAccount, Kingdom, Request_db)
-├── database.py             # Подключение к SQLite, сессии, базовый класс
-├── static/
-│   └── css/
-│       └── kingdom_style.css   # Стили для страницы королевства
-├── scripts/
-│   └── kingdom_script.js       # Клиентская логика управления королевством
-├── templates/
-│   ├── index.html          # Страница входа
-│   ├── reg.html            # Страница регистрации
-│   ├── file_maneger.html   # Список королевств пользователя
-│   └── kingdom.html        # Главная панель управления королевством
-└── database.db             # Создаётся автоматически при первом запуске
+Структура проекта\n
+text\n
+project/\n
+├── main.py                 # Основное приложение FastAPI, маршруты\n
+├── Forms.py                # Pydantic-схемы и SQLAlchemy-модели (UserAccount, Kingdom, Request_db)\n
+├── database.py             # Подключение к SQLite, сессии, базовый класс\n
+├── static/\n
+│   └── css/\n
+│       └── kingdom_style.css   # Стили для страницы королевства\n
+├── scripts/\n
+│   └── kingdom_script.js       # Клиентская логика управления королевством\n
+├── templates/\n
+│   ├── index.html          # Страница входа\n
+│   ├── reg.html            # Страница регистрации\n
+│   ├── file_maneger.html   # Список королевств пользователя\n
+│   └── kingdom.html        # Главная панель управления королевством\n
+└── database.db             # Создаётся автоматически при первом запуске\n
 API эндпоинты
 Метод	Endpoint	Описание
 GET	/	Страница входа
