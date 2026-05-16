@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Профиль</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
+</head>
+<body class="bg-black">
+<nav class="navbar navbar-expand-lg bg-dark border-bottom border-warning">
+    <div class="container">
+        <a class="navbar-brand text-warning" href="/file_maneger">🏰 Kingdom Tower</a>
+        <div class="ms-auto">
+            <a href="/file_maneger" class="btn btn-outline-warning me-2">📁 Файлы</a>
+            <a href="/logout" class="btn btn-outline-danger">Выйти</a>
+        </div>
+    </div>
+</nav>
+<div class="container mt-3 mt-md-5">
+    <div class="card bg-dark text-white shadow-lg">
+        <div class="card-header bg-warning text-dark fw-bold">👤 Профиль пользователя</div>
+        <div class="card-body">
+            <p><strong>Имя:</strong> {{ username }}</p>
+            <p><strong>Количество королевств:</strong> {{ total_kingdoms }}</p>
+            <p><strong>Последний вход:</strong> {{ last_login }}</p>
+            {% if best_kingdom %}
+            <p><strong>🏆 Лучшее королевство:</strong> {{ best_kingdom.name }} (уровень {{ best_kingdom.level }}, золото
+                {{ best_kingdom.gold }})</p>
+            {% else %}
+            <p><strong>🏆 Лучшее королевство:</strong> нет</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
