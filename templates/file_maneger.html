@@ -2,33 +2,45 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/file_manager_style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Файловый менеджер</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
 </head>
-<body>
-<div class="container">
-    <div class="toolbar">
-        <button class="btn-upload" onclick="uploadSelected()">
-            <span class="icon">💾</span> Загрузить
-        </button>
-        <button class="btn-delete" onclick="deleteSelected()">
-            <span class="icon">🗑️</span> Удалить
-        </button>
-        <button class="btn-create" onclick="createKingdom()">Создать</button>
+<body class="bg-black">
+    <nav class="navbar navbar-expand-lg bg-dark border-bottom border-warning">
+        <div class="container">
+            <a class="navbar-brand text-warning" href="/file_maneger">🏰 Kingdom Tower</a>
+            <div class="ms-auto">
+                <a href="/profile" class="btn btn-outline-warning me-2">👤 Профиль</a>
+                <a href="/logout" class="btn btn-outline-danger">Выйти</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-3 mt-md-5">
+        <div class="card bg-dark text-white shadow-lg">
+            <div class="card-header bg-warning text-dark fw-bold">📁 Управление королевствами</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <button class="btn btn-success flex-grow-1 flex-md-grow-0" onclick="createKingdom()">➕ Создать</button>
+                    <button class="btn btn-primary flex-grow-1 flex-md-grow-0" onclick="uploadSelected()">💾 Загрузить</button>
+                    <button class="btn btn-danger flex-grow-1 flex-md-grow-0" onclick="deleteSelected()">🗑️ Удалить</button>
+                </div>
+                <div class="workspace">
+                    {% if kingdoms %}
+                        <ul id="kingdom-list" class="list-group">
+                            {% for k in kingdoms %}
+                                <li data-id="{{ k.id }}" class="list-group-item list-group-item-action bg-secondary text-white" onclick="selectKingdom(this)">{{ k.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Нет королевств</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="workspace">
-        {% if kingdoms %}
-        <ul id="kingdom-list">
-            {% for k in kingdoms %}
-            <li data-id="{{ k.id }}" onclick="selectKingdom(this)">{{ k.name }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>Нет королевств</p>
-        {% endif %}
-    </div>
-</div>
-<script src="/scripts/file_script.js"></script>
+    <script src="/scripts/file_script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
