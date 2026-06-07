@@ -25,8 +25,6 @@ class Kingdom(Base):
     gold = Column(Integer)
     iron = Column(Integer)
     factor = Column(Integer)
-    tools = Column(Integer)
-    weapons = Column(Integer)
     # Население
     people_count = Column(Integer)
     happy = Column(Integer)
@@ -49,9 +47,12 @@ class Kingdom(Base):
     ride = Column(Integer)
     logic = Column(Integer)
     warehouse = Column(Integer)
+    warehouse_level = Column(String, default="0,0,0")  # Формат: "L1,L2,L3"
 
     user = relationship("UserAccount", back_populates="kingdoms")
     requests = relationship("Request_db", back_populates="kingdom", cascade="all, delete-orphan")
+    warehouse_items = relationship("WarehouseItem", back_populates="kingdom", cascade="all, delete-orphan")
+    tech_researches = relationship("TechResearch", back_populates="kingdom", cascade="all, delete-orphan")
 
     __table_args__ = (UniqueConstraint('user_id', 'name', name='_user_kingdom_uc'),)
 
@@ -65,3 +66,28 @@ class Request_db(Base):
     count = Column(Integer, nullable=False)
 
     kingdom = relationship("Kingdom", back_populates="requests")
+
+
+class WarehouseItem(Base):
+    __tablename__ = 'warehouse_items'
+
+    id = Column(Integer, primary_key=True, index=True)
+    kingdom_id = Column(Integer, ForeignKey('kingdoms.id'), nullable=False)
+    name = Column(String(100), nullable=False)
+    count = Column(Integer, nullable=False, default=0)
+    storage_type = Column(String(10), nullable=False)  # 'single' or 'stack'
+
+    # Связь с королевством
+    kingdom = relationship("Kingdom", back_populates="warehouse_items")
+
+
+class TechResearch(Base):
+    __tablename__ = 'tech_researches'
+
+    id = Column(Integer, primary_key=True, index=True)
+    kingdom_id = Column(Integer, ForeignKey('kingdoms.id'), nullable=False)
+    tree = Column(String(20), nullable=False)  # 'trade', 'military', 'management', 'special'
+    level = Column(Integer, nullable=False)
+    variant = Column(String(50), nullable=True)  # для уровней с вариантами
+
+    kingdom = relationship("Kingdom", back_populates="tech_researches")
