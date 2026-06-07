@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Технологии - Kingdom Tower</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <style>
+        .tech-tree {
+            background: #1a1a1a;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #f5c542;
+        }
+        .tech-card {
+            background: #2c2c2c;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        .tech-card.learned {
+            background: #1e4d1e;
+            border-left: 3px solid #00ff00;
+        }
+        .tech-card.available {
+            background: #4d3e1e;
+            border-left: 3px solid #f5c542;
+        }
+        .tech-card.locked {
+            background: #2c2c2c;
+            opacity: 0.6;
+        }
+        .tech-level {
+            font-weight: bold;
+            color: #f5c542;
+            margin-right: 0.5rem;
+        }
+        .variant-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .btn-learn-variant {
+            background-color: #f5c542;
+            color: #000;
+            border: none;
+            padding: 0.2rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .btn-learn-variant:hover {
+            background-color: #e0b031;
+        }
+        .badge-variant {
+            font-size: 0.7rem;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .tech-name {
+            font-weight: bold;
+        }
+        .learned-list {
+            background: #1a1a1a;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #00ff00;
+        }
+        .learned-item {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body class="bg-black">
+<nav class="navbar navbar-expand-lg bg-dark border-bottom border-warning">
+    <div class="container">
+        <a class="navbar-brand text-warning" href="/file_maneger">🏰 Kingdom Tower</a>
+        <div class="ms-auto">
+            <a href="/kingdom?kingdom_id={{ kingdom.id }}" class="btn btn-outline-warning">← Назад</a>
+        </div>
+    </div>
+</nav>
+<div class="container mt-3 mt-md-4">
+    <div class="card bg-dark text-white shadow-lg">
+        <div class="card-header bg-warning text-dark fw-bold">🔬 Технологии королевства «{{ kingdom.name }}»</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Уровень королевства:</strong> {{ kingdom.level }}</p>
+                    <p><strong>Золото в казне:</strong> {{ kingdom.kazna }}</p>
+                </div>
+                <div class="col-md-8">
+                    <div class="alert alert-info">
+                        💡 Стоимость одного навыка: уровень × 10 золота.<br>
+                        🔬 Для уровней 7+ требуется <strong>исследовательский пакет</strong> на складе (за каждый навык).<br>
+                        💎 Для уровня 10 требуется <strong>бриллиант</strong> на складе (за каждый навык).<br>
+                        📚 Навыки, разделенные "и", можно изучать оба (каждый отдельно).
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-9">
+                    <div class="tech-tree">
+                        <h4 class="text-warning">📈 Торговля</h4>
+                        <div id="trade-tree"></div>
+                    </div>
+                    <div class="tech-tree">
+                        <h4 class="text-warning">⚔️ Военная</h4>
+                        <div id="military-tree"></div>
+                    </div>
+                    <div class="tech-tree">
+                        <h4 class="text-warning">🏛️ Управление</h4>
+                        <div id="management-tree"></div>
+                    </div>
+                    <div class="tech-tree">
+                        <h4 class="text-warning">✨ Особое</h4>
+                        <div id="special-tree"></div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="learned-list">
+                        <h5 class="text-success">✅ Изученные навыки</h5>
+                        <div id="learned-skills-list" style="max-height: 500px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="variantModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-warning">
+                <h5 class="modal-title text-warning">Выбор варианта</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="variantModalBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const kingdomId = {{ kingdom.id }};
+    const techTrees = {{ tech_trees|tojson }};
+    const statuses = {{ statuses|tojson }};
+    const kingdomLevel = {{ kingdom.level }};
+
+    const variantNames = {
+        'warehouse2': 'Склад 2', 'transport2': 'Транспорт 2',
+        'warehouse3': 'Склад 3', 'transport3': 'Транспорт 3',
+        'squad6': 'Увеличение отряда 6', 'two_commanders': 'Два командира',
+        'fort2': 'Форт 2', 'war_transport2': 'Военный транспорт 2',
+        'squad9': 'Увеличение отряда 9', 'initiative1': 'Инициатива +1',
+        'fort3': 'Форт 3', 'initiative1_2': 'Инициатива +1',
+        'general': 'Генерал', 'cannon': 'Пушка',
+        'squad12': 'Увеличение отряда 12', 'initiative5': 'Инициатива +5',
+        'forest_settlement': 'Заселение леса', 'remove_rocks': 'Убрать скалы',
+        'capitals': 'Создание столиц', 'water_housing': 'Жильё на воде',
+        'fishing': 'Рыбный промысел', 'colonization': 'Колонизация 4×4',
+        'enterprises2': 'Предприятия 2', 'mine': 'Шахта',
+        'housing': 'Жилищный вопрос', 'military_towns': 'Военные городки',
+        'foreign_policy': 'Внешняя политика', 'domestic_policy': 'Внутренняя политика',
+        'army_price': 'Цена на армию', 'trade_prices': 'Цены на торговлю', 'research_prices': 'Цены на исследование',
+        'army_upkeep': 'Содержание армии', 'better_sell': 'Продажа по более выгодной цене', 'institute_upkeep': 'Содержание института',
+        'recruit_cost': 'Снижение цены рекрутов', 'more_storage': 'Больше места в складах', 'cashback20': 'Возврат 20% с покупки',
+        'army_mobility': 'Мобильность армии', 'goods_bonus': '+20% к товарам', 'second_skill': 'Возможность изучить второй навык',
+        'recruit_cost2': 'Снижение цены рекрутов 2', 'diamonds2': 'Алмазы 2', 'institute_upkeep1': 'Содержание институтов 1',
+        'create_armies': 'Создание армий', 'expensive_sell2': 'Дорогая продажа 2', 'cashback50': 'Кешбек 50%',
+        'fort_bonus2': 'Бонус форта 2', 'cheap_processing': 'Дешёвая обработка', 'level_up1': 'Уровень +1',
+        'three_generals': '3 генерала', 'no_diamonds_buy': 'Покупка без бриллиантов', 'two_level10': '2 навыка 10 уровня',
+        'ship': 'Корабль', 'transport': 'Транспорт',
+        'logistics_center': 'Логистический центр', 'price_setting': 'Назначение цен',
+        'contracts': 'Контракты', 'military_trade': 'Торговля военными',
+        'barracks': 'Казарма', 'fort': 'Форт',
+        'capture': 'Захват', 'defense': 'Оборона',
+        'archers': 'Лучники', 'war_transport': 'Военный транспорт',
+        'noria': 'Нория', 'reservoir': 'Резервар',
+        'iron_processing': 'Обработка железа', 'smithy': 'Кузница'
+    };
+
+    function renderLearnedSkills() {
+        const container = document.getElementById('learned-skills-list');
+        container.innerHTML = '';
+        const treesOrder = ['trade', 'military', 'management', 'special'];
+        const treeNames = {'trade': 'Торговля', 'military': 'Военная', 'management': 'Управление', 'special': 'Особая'};
+        for (let tree of treesOrder) {
+            const treeStatus = statuses[tree];
+            let hasLearned = false;
+            for (let level in treeStatus) {
+                const learnedVariants = treeStatus[level].variants;
+                if (learnedVariants.length > 0) {
+                    if (!hasLearned) {
+                        const header = document.createElement('div');
+                        header.className = 'fw-bold mt-2 mb-1 text-warning';
+                        header.innerText = treeNames[tree];
+                        container.appendChild(header);
+                        hasLearned = true;
+                    }
+                    const levelDiv = document.createElement('div');
+                    levelDiv.className = 'learned-item';
+                    const levelSpan = document.createElement('span');
+                    levelSpan.className = 'fw-bold me-2';
+                    levelSpan.innerText = `Ур.${level}:`;
+                    levelDiv.appendChild(levelSpan);
+                    const techInfo = techTrees[tree][level];
+                    let displayText = '';
+                    if (learnedVariants.includes(null) || (learnedVariants.length === 1 && learnedVariants[0] === null)) {
+                        displayText = techInfo.name;
+                    } else if (learnedVariants.length > 0) {
+                        const variantNamesList = learnedVariants.map(v => variantNames[v] || v);
+                        displayText = variantNamesList.join(', ');
+                    } else {
+                        displayText = techInfo.name;
+                    }
+                    const nameSpan = document.createElement('span');
+                    nameSpan.innerText = displayText;
+                    levelDiv.appendChild(nameSpan);
+                    container.appendChild(levelDiv);
+                }
+            }
+        }
+        if (container.children.length === 0) {
+            container.innerHTML = '<em class="text-muted">Нет изученных навыков</em>';
+        }
+    }
+
+    function renderTree(containerId, treeKey, treeData) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const levels = Object.keys(treeData).sort((a,b)=>a-b);
+        for (let lvl of levels) {
+            const tech = treeData[lvl];
+            const learnedVariants = statuses[treeKey][lvl].variants;
+            const hasVariants = tech.variants && tech.variants.length > 0;
+            const isMultiple = tech.multiple === true;
+            const isSpecial = (treeKey === 'special');
+
+            let branchIdx = -1;
+            let branchMissing = false;
+            if (isSpecial && lvl > 3) {
+                const level3Variants = statuses['special'][3].variants;
+                if (!level3Variants || level3Variants.length === 0 || level3Variants[0] === null) {
+                    branchMissing = true;
+                } else {
+                    const level3Choice = level3Variants[0];
+                    const level3Options = techTrees['special'][3].variants;
+                    branchIdx = level3Options.indexOf(level3Choice);
+                    if (branchIdx === -1) branchMissing = true;
+                }
+            }
+
+            let availableVariants = [];
+            if (hasVariants && !branchMissing) {
+                if (isSpecial && lvl > 3) {
+                    if (branchIdx >= 0 && branchIdx < tech.variants.length) {
+                        const requiredVariant = tech.variants[branchIdx];
+                        if (!learnedVariants.includes(requiredVariant)) {
+                            availableVariants = [requiredVariant];
+                        }
+                    }
+                } else {
+                    availableVariants = tech.variants.filter(v => !learnedVariants.includes(v));
+                }
+            } else if (!hasVariants && !branchMissing && !learnedVariants.length && lvl <= 2 && isSpecial) {
+                // Для особых 1 и 2 уровня без вариантов
+                availableVariants = [];
+            }
+
+            let cardClass = 'locked';
+            if (branchMissing) {
+                cardClass = 'locked';
+            } else if (hasVariants && availableVariants.length === 0 && learnedVariants.length > 0) {
+                cardClass = 'learned';
+            } else if (hasVariants && availableVariants.length > 0) {
+                cardClass = 'available';
+            } else if (!hasVariants && learnedVariants.length > 0) {
+                cardClass = 'learned';
+            } else if (!hasVariants && lvl <= 2 && isSpecial && learnedVariants.length === 0 && kingdomLevel >= lvl) {
+                cardClass = 'available';
+            } else if (!hasVariants && !isSpecial && learnedVariants.length === 0 && kingdomLevel >= lvl) {
+                cardClass = 'available';
+            } else {
+                cardClass = 'locked';
+            }
+
+            const card = document.createElement('div');
+            card.className = `tech-card ${cardClass}`;
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'd-flex align-items-center flex-wrap gap-2';
+            headerDiv.innerHTML = `<span class="tech-level">Ур.${lvl}</span><span class="tech-name">${tech.name}</span>`;
+            learnedVariants.forEach(v => {
+                if (v === null) return;
+                const badge = document.createElement('span');
+                badge.className = 'badge-variant';
+                badge.textContent = variantNames[v] || v;
+                headerDiv.appendChild(badge);
+            });
+            card.appendChild(headerDiv);
+
+            if (availableVariants.length > 0 && !branchMissing) {
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'variant-buttons';
+                if (isMultiple || (hasVariants && !tech.multiple && availableVariants.length === 1)) {
+                    availableVariants.forEach(v => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-learn-variant';
+                        btn.innerHTML = `📖 ${variantNames[v] || v}`;
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            learnTech(treeKey, parseInt(lvl), v);
+                        };
+                        buttonsDiv.appendChild(btn);
+                    });
+                } else if (!isMultiple && hasVariants && availableVariants.length > 1) {
+                    const chooseBtn = document.createElement('button');
+                    chooseBtn.className = 'btn-learn-variant';
+                    chooseBtn.innerHTML = '🎲 Выбрать вариант';
+                    chooseBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        showVariantModal(treeKey, parseInt(lvl), availableVariants);
+                    };
+                    buttonsDiv.appendChild(chooseBtn);
+                }
+                card.appendChild(buttonsDiv);
+            } else if (!hasVariants && cardClass === 'available') {
+                const btn = document.createElement('button');
+                btn.className = 'btn-learn-variant';
+                btn.innerHTML = '📖 Изучить';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    learnTech(treeKey, parseInt(lvl), null);
+                };
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'variant-buttons';
+                buttonsDiv.appendChild(btn);
+                card.appendChild(buttonsDiv);
+            }
+            container.appendChild(card);
+        }
+    }
+
+    async function learnTech(tree, level, variant) {
+        try {
+            const resp = await fetch('/technology/learn', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({kingdom_id: kingdomId, tree: tree, level: level, variant: variant})
+            });
+            if (resp.ok) {
+                window.location.reload();
+            } else {
+                const err = await resp.json();
+                alert('Ошибка: ' + (err.detail || 'Неизвестная ошибка'));
+            }
+        } catch(e) {
+            alert('Ошибка сети: ' + e.message);
+        }
+    }
+
+    function showVariantModal(tree, level, variants) {
+        const modalBody = document.getElementById('variantModalBody');
+        modalBody.innerHTML = '';
+        variants.forEach(v => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-warning w-100 mb-2';
+            btn.innerHTML = `📖 ${variantNames[v] || v}`;
+            btn.onclick = () => {
+                bootstrap.Modal.getInstance(document.getElementById('variantModal')).hide();
+                learnTech(tree, level, v);
+            };
+            modalBody.appendChild(btn);
+        });
+        const modal = new bootstrap.Modal(document.getElementById('variantModal'));
+        modal.show();
+    }
+
+    renderTree('trade-tree', 'trade', techTrees.trade);
+    renderTree('military-tree', 'military', techTrees.military);
+    renderTree('management-tree', 'management', techTrees.management);
+    renderTree('special-tree', 'special', techTrees.special);
+    renderLearnedSkills();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
