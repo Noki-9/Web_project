@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Request, Depends, HTTPException, Form
+from datetime import datetime
+
+import bcrypt
+from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
+
 from database import engine, session_local
-from Forms import Base, UserAccount, Kingdom, Request_db, WarehouseItem, TechResearch
-from datetime import datetime
-import bcrypt
+from Forms import Base, Kingdom, Request_db, TechResearch, UserAccount, WarehouseItem
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -201,7 +203,7 @@ async def save_kingdom(request: Request, db: Session = Depends(get_db)):
         if "UNIQUE constraint failed: kingdoms.user_id, kingdoms.name" in str(e.orig):
             raise HTTPException(400, "Королевство с таким именем уже существует")
         else:
-            raise HTTPException(400, f"Ошибка базы данных: {str(e)}")
+            raise HTTPException(400, f"Ошибка базы данных: {e!s}")
 
     return {"status": "ok", "id": kingdom_id}
 
@@ -546,7 +548,7 @@ async def technology_page(request: Request, kingdom_id: int, db: Session = Depen
         raise HTTPException(404, "Королевство не найдено")
 
     statuses = {}
-    for tree in TECH_TREES.keys():
+    for tree in TECH_TREES:
         statuses[tree] = get_tech_status(kingdom, tree, db)
 
     return templates.TemplateResponse("technology.html", {
